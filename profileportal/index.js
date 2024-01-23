@@ -7,20 +7,23 @@ import YAML from "yaml";
 import swaggerUi from "swagger-ui-express";
 import routes from "./src/config/routes";
 import dayjs from "dayjs";
-import { sequelize } from "./src/config/db.config";
+import { sequelize, authSqualize } from "./src/config/db.config";
 import { initModels } from "./src/app/models/init-models";
+import { initModels as authInitModels } from "./src/app/auth/init-models";
 import { DataTypes } from "sequelize";
+import { OpenApiValidator } from "express-openapi-validator";
 
 /* CONFIG */
 const bodyParser = require("body-parser");
 const port = process.env.LINEPORT || 3306;
 
 var app = express();
-global.apiModels = initModels( sequelize, DataTypes );
+global.appointmentDb = initModels( sequelize, DataTypes );
+global.authDb = authInitModels( authSqualize, DataTypes );
 
 // ( async () => {
 //   try {
-//     console.log(await apiModels.appointments.findAll())
+//     console.log(await appointmentDb.appointments.findAll())
 //     console.log('Connection has been established successfully.');
 //   } catch (error) {
 //     console.error('Unable to connect to the database:', error);
@@ -55,7 +58,16 @@ app.get("/", (req, res) => {
   res.send(
     `Profile Portal Service is running`
   );
-});
+} );
+
+/ * OpenAPI Specification * /
+// const apiSpec = path.join( __dirname, 'api.yaml' );
+// app.use(
+//   OpenApiValidator.middleware({
+//     apiSpec,
+//     validateResponses: true, // default false
+//   }),
+// );
 
 routes(app);
 

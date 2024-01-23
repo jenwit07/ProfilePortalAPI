@@ -12,7 +12,7 @@ export const loginUser = async (req, res) => {
 
 export const verifyToken = async (req, res) => {
     try {
-        const result = await verifyTokenService(req.token);
+        const result = await verifyTokenService(req.headers.authorization);
         res.status(200).send(result);
     } catch (err) {
         console.error(err);

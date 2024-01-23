@@ -23,17 +23,19 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    create_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
+    create_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     create_by: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    update_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
+    update_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     update_by: {
       type: DataTypes.STRING(255),

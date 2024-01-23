@@ -9,7 +9,8 @@
     "babel-node": "babel-node",
     "start:dev": "cross-env NODE_ENV=development nodemon --exec npm run babel-node -- ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "create:models": "sequelize-auto -o \"./src/app/models\" -d appointmentdb -h localhost -u dbadmin -p 5433 -x test2024! -e postgres"
+    "appointment:models": "sequelize-auto -o \"./src/app/models\" -d appointmentdb -h localhost -u dbadmin -p 5433 -x test2024! -e postgres",
+    "auth:models": "sequelize-auto -o \"./src/app/auth\" -d authdb -h localhost -u dbadmin -p 5434 -x test2024! -e postgres"
   },
   "keywords": [
     "swagger"
@@ -28,6 +29,7 @@
     "custom-env": "^2.0.2",
     "dayjs": "^1.11.10",
     "express": "^4.18.2",
+    "express-openapi-validator": "^5.1.2",
     "express-session": "^1.17.3",
     "joi": "^17.12.0",
     "jsonwebtoken": "^9.0.2",

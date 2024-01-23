@@ -1,4 +1,4 @@
-import { getAppointmentService, createAppointmentService, updateAppointmentService, deleteAppointmentService } from "../service/AppointmentsService";
+import { getAppointmentService, createAppointmentService, updateAppointmentService, deleteAppointmentService, getAppointmentByIdService } from "../service/AppointmentsService";
 
 export const getAppointments = async (req, res) => {
     try {
@@ -20,6 +20,19 @@ export const createAppointment = async (req, res) => {
     }
 };
 
+export const getAppointmentById = async ( req, res ) => {
+    try {
+        const result = await getAppointmentByIdService( req.params.appointmentId );
+        if ( !result ) {
+            return res.status(404).send({ message: "Appointment not found" });
+        }
+        res.status(200).send(result);
+    } catch (err) {
+        console.error(err);
+        res.status(400).send({ name: err.name, message: err.message });
+    }
+}
+
 export const updateAppointment = async (req, res) => {
     try {
         const response = await updateAppointmentService(req.params.appointmentId, req.body);
@@ -29,7 +42,7 @@ export const updateAppointment = async (req, res) => {
         res.status(204).send();
     } catch (err) {
         console.error(err);
-        res.status(400).send({ message: err });
+        res.status(400).send({ name: err.name, message: err.message });
     }
 };
 
@@ -42,6 +55,6 @@ export const deleteAppointment = async (req, res) => {
         res.status(204).send();
     } catch (err) {
         console.error(err);
-        res.status(400).send({ message: err });
+        res.status(400).send({ name: err.name, message: err.message });
     }
 };

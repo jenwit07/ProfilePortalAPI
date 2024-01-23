@@ -1,8 +1,8 @@
-export async function getComments(appointmentId) {
+export async function getCommentsService(appointmentId) {
   try {
-    const comments = await apiModels.comments.findAll({
+    const comments = await appointmentDb.comments.findAll({
       where: { appointment_id: appointmentId },
-      order: [['create_date', 'ASC']],
+      order: [['create_datetime', 'ASC']],
     });
     return comments;
   } catch (e) {
@@ -10,23 +10,24 @@ export async function getComments(appointmentId) {
   }
 }
 
-export async function addComment(appointmentId, commentData) {
+export async function addCommentService(appointmentId, commentData) {
   try {
     commentData.appointment_id = appointmentId;
-    const newComment = await apiModels.comments.create(commentData);
+    commentData.update_by = commentData.create_by;
+    const newComment = await appointmentDb.comments.create(commentData);
     return newComment;
   } catch (e) {
     throw e;
   }
 }
 
-export async function updateComment(commentId, commentData) {
+export async function updateCommentService(commentId, commentData) {
   try {
-    const result = await apiModels.comments.update(commentData, {
+    const result = await appointmentDb.comments.update(commentData, {
       where: { id: commentId },
     });
-    if (result[0] === 0) {
-      throw new Error('Comment not found or no changes made');
+    if ( result[0] === 0 ) {
+      return result;
     } else {
       return { message: 'Comment updated successfully' };
     }
@@ -35,13 +36,13 @@ export async function updateComment(commentId, commentData) {
   }
 }
 
-export async function deleteComment(commentId) {
+export async function deleteCommentService(commentId) {
   try {
-    const result = await apiModels.comments.destroy({
+    const result = await appointmentDb.comments.destroy({
       where: { id: commentId },
     });
-    if (result === 0) {
-      throw new Error('Comment not found');
+    if ( result === 0 ) {
+      return result;
     } else {
       return { message: 'Comment deleted successfully' };
     }

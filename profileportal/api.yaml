@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
   version: '1.0.0'
-  title: 'Appointment Management API'
-  description: 'API for managing recruitment appointments, comments, and update history with Authentication.'
+  title: 'Profile Portal API'
+  description: 'API for managing recruitment appointments, comments'
 basePath: '/profileportal'
 schemes:
   - 'http'
@@ -14,12 +14,57 @@ securityDefinitions:
     in: 'header'
 
 tags:
+  - name: 'Authentication'
   - name: 'Appointments'
   - name: 'Comments'
-  - name: 'Update History'
-  - name: 'Authentication'
 
 paths:
+  /v1/auth/login:
+    post:
+      tags: [ 'Authentication' ]
+      summary: 'User Login'
+      parameters:
+        - in: 'body'
+          name: 'credentials'
+          required: true
+          schema:
+            $ref: '#/definitions/Credentials'
+      responses:
+        200:
+          description: 'Login successful, token returned.'
+          schema:
+            $ref: '#/definitions/TokenResponse'
+        401:
+          description: 'Unauthorized, invalid credentials.'
+  /v1/auth/verify:
+    get:
+      tags: [ 'Authentication' ]
+      security:
+        - BearerAuth: []
+      summary: 'Verify Token and Get Roles'
+      responses:
+        200:
+          description: 'Token is valid, user roles returned.'
+          schema:
+            $ref: '#/definitions/UserRoles'
+        401:
+          description: 'Unauthorized, token invalid or missing.'
+  /v1/auth/register:
+    post:
+      tags: [ 'Authentication' ]
+      summary: 'User Registration with Role Assignment'
+      description: 'Register a new user with a specified role.'
+      parameters:
+        - in: 'body'
+          name: 'registrationData'
+          required: true
+          schema:
+            $ref: '#/definitions/RegistrationData'
+      responses:
+        201:
+          description: 'User registered successfully.'
+        400:
+          description: 'Invalid input or role not allowed.'
   /v1/appointments:
     get:
       tags: [ 'Appointments' ]
@@ -28,9 +73,13 @@ paths:
       summary: 'Get List of Appointments'
       parameters:
         - in: 'query'
-          name: 'id'
+          name: 'status'
           required: false
           type: 'string'
+          enum:
+            - 'TO_DO'
+            - 'IN_PROGRESS'
+            - 'DONE'
         - in: 'query'
           name: 'cur_page'
           required: false
@@ -43,9 +92,20 @@ paths:
         200:
           description: 'A list of appointments'
           schema:
-            type: 'array'
-            items:
-              $ref: '#/definitions/Appointment'
+            type: 'object'
+            properties:
+              appointments:
+                type: 'array'
+                items:
+                  $ref: '#/definitions/Appointment'
+              total_records:
+                type: 'integer'
+              total_pages:
+                type: 'integer'
+              cur_page:
+                type: 'integer'
+              per_page:
+                type: 'integer'
     post:
       tags: [ 'Appointments' ]
       security:
@@ -63,6 +123,23 @@ paths:
         400:
           description: 'Invalid input'
   /v1/appointments/{appointmentId}:
+    get:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+      responses:
+        200:
+          description: 'An appointment'
+          schema:
+            $ref: '#/definitions/Appointment'
+        404:
+          description: 'Appointment not found'
     put:
       tags: [ 'Appointments' ]
       security:
@@ -100,6 +177,24 @@ paths:
           description: 'Appointment deleted'
         404:
           description: 'Appointment not found'
+  /v1/appointments/{appointmentId}/history:
+    get:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get Update History for an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+      responses:
+        200:
+          description: 'An array of update history logs for the appointment'
+          schema:
+            type: 'array'
+            items:
+              $ref: '#/definitions/ChangeLog'
   /v1/appointments/{appointmentId}/comments:
     get:
       tags: [ 'Comments' ]
@@ -138,17 +233,13 @@ paths:
           description: 'Comment added'
         400:
           description: 'Invalid input'
-  /v1/appointments/{appointmentId}/comments/{commentId}:
+  /v1/appointments/comments/{commentId}:
     put:
       tags: [ 'Comments' ]
       security:
         - BearerAuth: []
       summary: 'Update a Comment on an Appointment'
       parameters:
-        - in: 'path'
-          name: 'appointmentId'
-          required: true
-          type: 'integer'
         - in: 'path'
           name: 'commentId'
           required: true
@@ -157,7 +248,7 @@ paths:
           name: 'comment'
           required: true
           schema:
-            $ref: '#/definitions/CreateComment'
+            $ref: '#/definitions/UpdateComment'
       responses:
         200:
           description: 'Comment updated'
@@ -172,10 +263,6 @@ paths:
       summary: 'Delete a Comment from an Appointment'
       parameters:
         - in: 'path'
-          name: 'appointmentId'
-          required: true
-          type: 'integer'
-        - in: 'path'
           name: 'commentId'
           required: true
           type: 'integer'
@@ -184,91 +271,6 @@ paths:
           description: 'Comment deleted'
         404:
           description: 'Comment or appointment not found'
-  /v1/appointments/{appointmentId}/history:
-    get:
-      tags: [ 'Update History' ]
-      security:
-        - BearerAuth: []
-      summary: 'Get Update History for an Appointment'
-      parameters:
-        - in: 'path'
-          name: 'appointmentId'
-          required: true
-          type: 'integer'
-      responses:
-        200:
-          description: 'An array of update history logs for the appointment'
-          schema:
-            type: 'array'
-            items:
-              $ref: '#/definitions/ChangeLog'
-    post:
-      tags: [ 'Update History' ]
-      security:
-        - BearerAuth: []
-      summary: 'Add an Entry to Update History of an Appointment'
-      parameters:
-        - in: 'path'
-          name: 'appointmentId'
-          required: true
-          type: 'integer'
-        - in: 'body'
-          name: 'changeLog'
-          required: true
-          schema:
-            $ref: '#/definitions/CreateChangeLog'
-      responses:
-        201:
-          description: 'Change log entry added'
-        400:
-          description: 'Invalid input'
-  /auth/login:
-    post:
-      tags: [ 'Authentication' ]
-      summary: 'User Login'
-      parameters:
-        - in: 'body'
-          name: 'credentials'
-          required: true
-          schema:
-            $ref: '#/definitions/Credentials'
-      responses:
-        200:
-          description: 'Login successful, token returned.'
-          schema:
-            $ref: '#/definitions/TokenResponse'
-        401:
-          description: 'Unauthorized, invalid credentials.'
-  /auth/verify:
-    get:
-      tags: [ 'Authentication' ]
-      security:
-        - BearerAuth: []
-      summary: 'Verify Token and Get Roles'
-      responses:
-        200:
-          description: 'Token is valid, user roles returned.'
-          schema:
-            $ref: '#/definitions/UserRoles'
-        401:
-          description: 'Unauthorized, token invalid or missing.'
-  /auth/register:
-    post:
-      tags: [ 'Authentication' ]
-      summary: 'User Registration with Role Assignment'
-      description: 'Register a new user with a specified role.'
-      parameters:
-        - in: 'body'
-          name: 'registrationData'
-          required: true
-          schema:
-            $ref: '#/definitions/RegistrationData'
-      responses:
-        201:
-          description: 'User registered successfully.'
-        400:
-          description: 'Invalid input or role not allowed.'
-
 
 definitions:
   CreateAppointment:
@@ -306,11 +308,14 @@ definitions:
     required:
       - comment_name
     properties:
-      comment_name:
-        type: 'string'
       comment_details:
         type: 'string'
-      create_by:
+  UpdateComment:
+    type: 'object'
+    required:
+      - comment_name
+    properties:
+      comment_details:
         type: 'string'
   Comment:
     type: 'object'

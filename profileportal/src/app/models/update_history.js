@@ -27,13 +27,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(50),
       allowNull: true
     },
-    update_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: true
-    },
-    update_time: {
-      type: DataTypes.TIME,
-      allowNull: true
+    update_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     }
   }, {
     sequelize,

@@ -23,7 +23,7 @@ export const addComment = async (req, res) => {
 export const updateComment = async (req, res) => {
     try {
         const response = await updateCommentService(req.params.commentId, req.body);
-        if (response[0] == 0) {
+        if (response == 0) {
             return res.status(404).send({ message: "Comment not found" });
         }
         res.status(204).send();
@@ -36,7 +36,7 @@ export const updateComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
     try {
         const response = await deleteCommentService(req.params.commentId);
-        if (response[0] == 0) {
+        if (response == 0) {
             return res.status(404).send({ message: "Comment not found" });
         }
         res.status(204).send();

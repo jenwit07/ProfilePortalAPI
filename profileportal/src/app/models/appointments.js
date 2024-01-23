@@ -16,20 +16,27 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     status: {
-      type: DataTypes.STRING(50),
-      allowNull: true
+      type: DataTypes.ENUM("TO_DO","IN_PROGRESS","DONE","KEEP"),
+      allowNull: false,
+      defaultValue: "TO_DO"
     },
     created_by: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    create_date: {
-      type: DataTypes.DATEONLY,
+    create_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    update_by: {
+      type: DataTypes.STRING(255),
       allowNull: true
     },
-    create_time: {
-      type: DataTypes.TIME,
-      allowNull: true
+    update_datetime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     }
   }, {
     sequelize,
