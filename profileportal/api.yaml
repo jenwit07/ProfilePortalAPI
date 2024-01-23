@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
   version: '1.0.0'
-  title: 'Profile Portal API'
-  description: 'API for managing recruitment appointments.'
-basePath: '/api'
+  title: 'Appointment Management API'
+  description: 'API for managing recruitment appointments, comments, and update history with Authentication.'
+basePath: '/profileportal'
 schemes:
   - 'http'
 
@@ -17,6 +17,7 @@ tags:
   - name: 'Appointments'
   - name: 'Comments'
   - name: 'Update History'
+  - name: 'Authentication'
 
 paths:
   /v1/appointments:
@@ -25,6 +26,19 @@ paths:
       security:
         - BearerAuth: []
       summary: 'Get List of Appointments'
+      parameters:
+        - in: 'query'
+          name: 'id'
+          required: false
+          type: 'string'
+        - in: 'query'
+          name: 'cur_page'
+          required: false
+          type: 'integer'
+        - in: 'query'
+          name: 'per_page'
+          required: false
+          type: 'integer'
       responses:
         200:
           description: 'A list of appointments'
@@ -42,7 +56,7 @@ paths:
           name: 'appointment'
           required: true
           schema:
-            $ref: '#/definitions/Appointment'
+            $ref: '#/definitions/CreateAppointment'
       responses:
         201:
           description: 'Appointment created'
@@ -63,7 +77,7 @@ paths:
           name: 'appointment'
           required: true
           schema:
-            $ref: '#/definitions/Appointment'
+            $ref: '#/definitions/CreateAppointment'
       responses:
         200:
           description: 'Appointment updated'
@@ -118,7 +132,7 @@ paths:
           name: 'comment'
           required: true
           schema:
-            $ref: '#/definitions/Comment'
+            $ref: '#/definitions/CreateComment'
       responses:
         201:
           description: 'Comment added'
@@ -143,7 +157,7 @@ paths:
           name: 'comment'
           required: true
           schema:
-            $ref: '#/definitions/Comment'
+            $ref: '#/definitions/CreateComment'
       responses:
         200:
           description: 'Comment updated'
@@ -202,14 +216,76 @@ paths:
           name: 'changeLog'
           required: true
           schema:
-            $ref: '#/definitions/ChangeLog'
+            $ref: '#/definitions/CreateChangeLog'
       responses:
         201:
           description: 'Change log entry added'
         400:
           description: 'Invalid input'
+  /auth/login:
+    post:
+      tags: [ 'Authentication' ]
+      summary: 'User Login'
+      parameters:
+        - in: 'body'
+          name: 'credentials'
+          required: true
+          schema:
+            $ref: '#/definitions/Credentials'
+      responses:
+        200:
+          description: 'Login successful, token returned.'
+          schema:
+            $ref: '#/definitions/TokenResponse'
+        401:
+          description: 'Unauthorized, invalid credentials.'
+  /auth/verify:
+    get:
+      tags: [ 'Authentication' ]
+      security:
+        - BearerAuth: []
+      summary: 'Verify Token and Get Roles'
+      responses:
+        200:
+          description: 'Token is valid, user roles returned.'
+          schema:
+            $ref: '#/definitions/UserRoles'
+        401:
+          description: 'Unauthorized, token invalid or missing.'
+  /auth/register:
+    post:
+      tags: [ 'Authentication' ]
+      summary: 'User Registration with Role Assignment'
+      description: 'Register a new user with a specified role.'
+      parameters:
+        - in: 'body'
+          name: 'registrationData'
+          required: true
+          schema:
+            $ref: '#/definitions/RegistrationData'
+      responses:
+        201:
+          description: 'User registered successfully.'
+        400:
+          description: 'Invalid input or role not allowed.'
+
 
 definitions:
+  CreateAppointment:
+    type: 'object'
+    properties:
+      topic:
+        type: 'string'
+      description:
+        type: 'string'
+      status:
+        type: 'string'
+        enum:
+          - 'TO_DO'
+          - 'IN_PROGRESS'
+          - 'DONE'
+      created_by:
+        type: 'string'
   Appointment:
     type: 'object'
     properties:
@@ -223,9 +299,18 @@ definitions:
         type: 'string'
       created_by:
         type: 'string'
-      create_date:
+      create_datetime:
         type: 'string'
-      create_time:
+  CreateComment:
+    type: 'object'
+    required:
+      - comment_name
+    properties:
+      comment_name:
+        type: 'string'
+      comment_details:
+        type: 'string'
+      create_by:
         type: 'string'
   Comment:
     type: 'object'
@@ -238,13 +323,27 @@ definitions:
         type: 'string'
       comment_details:
         type: 'string'
-      create_date:
+      create_datetime:
         type: 'string'
       create_by:
         type: 'string'
-      update_date:
+      update_datetime:
         type: 'string'
       update_by:
+        type: 'string'
+  CreateChangeLog:
+    type: 'object'
+    required:
+      - appointment_id
+      - topic
+    properties:
+      id:
+        type: 'integer'
+      topic:
+        type: 'string'
+      description:
+        type: 'string'
+      status:
         type: 'string'
   ChangeLog:
     type: 'object'
@@ -259,7 +358,41 @@ definitions:
         type: 'string'
       status:
         type: 'string'
-      update_date:
+      create_datetime:
         type: 'string'
-      update_time:
+  Credentials:
+    type: 'object'
+    required:
+      - username
+      - password
+    properties:
+      username:
         type: 'string'
+      password:
+        type: 'string'
+  TokenResponse:
+    type: 'object'
+    properties:
+      token:
+        type: 'string'
+  UserRoles:
+    type: 'object'
+    properties:
+      roles:
+        type: 'array'
+        items:
+          type: 'string'
+  RegistrationData:
+    type: 'object'
+    required:
+      - username
+      - password
+      - role
+    properties:
+      username:
+        type: 'string'
+      password:
+        type: 'string'
+      role:
+        type: 'string'
+

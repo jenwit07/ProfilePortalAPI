@@ -1,44 +1,70 @@
-'use strict';
+require("custom-env").env(`${process.env.NODE_ENV}`);
+import express from "express";
+import { json, urlencoded } from "body-parser";
+import cors from "cors";
+import fs from "fs";
+import YAML from "yaml";
+import swaggerUi from "swagger-ui-express";
+import routes from "./src/config/routes";
+import dayjs from "dayjs";
+import { sequelize } from "./src/config/db.config";
+import { initModels } from "./src/app/models/init-models";
+import { DataTypes } from "sequelize";
 
-var fs = require('fs'),
-    path = require('path'),
-    http = require('http');
+/* CONFIG */
+const bodyParser = require("body-parser");
+const port = process.env.LINEPORT || 3306;
 
-var app = require('connect')();
-var swaggerTools = require('swagger-tools');
-var jsyaml = require('js-yaml');
-var serverPort = 8080;
+var app = express();
+global.apiModels = initModels( sequelize, DataTypes );
 
-// swaggerRouter configuration
-var options = {
-  swaggerUi: path.join(__dirname, '/swagger.json'),
-  controllers: path.join(__dirname, './controllers'),
-  useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
-};
+// ( async () => {
+//   try {
+//     console.log(await apiModels.appointments.findAll())
+//     console.log('Connection has been established successfully.');
+//   } catch (error) {
+//     console.error('Unable to connect to the database:', error);
+//   }
+// })()
 
-// The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
-var spec = fs.readFileSync(path.join(__dirname,'api/swagger.yaml'), 'utf8');
-var swaggerDoc = jsyaml.safeLoad(spec);
+app.use(json({ limit: "50mb", extended: true }));
+app.use(urlencoded({ limit: "50mb", extended: true }));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Expose-Headers", "ETag");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
+app.use(cors());
 
-// Initialize the Swagger middleware
-swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
-  // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
-  app.use(middleware.swaggerMetadata());
+/ * Swagger Documentation * /
+const file  = fs.readFileSync('./api.yaml', 'utf8')
+const swaggerDocument = YAML.parse(file)
+app.use('/profileportal/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-  // Validate Swagger requests
-  app.use(middleware.swaggerValidator());
+app.get("/", (req, res) => {
+  res.send(
+    `Profile Portal Service is running`
+  );
+});
 
-  // Route validated requests to appropriate controller
-  app.use(middleware.swaggerRouter(options));
+routes(app);
 
-  // Serve the Swagger documents and Swagger UI
-  app.use(middleware.swaggerUi());
-
-  // Start the server
-  http.createServer(app).listen(serverPort, function () {
-    console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-    console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
-  });
-
+app.listen(port, () => {
+  console.log(
+    `#### Stat Time ${dayjs().format(
+      "DD/MM/YYYY HH:mm:ss"
+    )} --- Profile Portal Service is running on port ${port} and ${
+      process.env.APP_ENV
+    } env`
+  );
 });
