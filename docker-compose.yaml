@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  appointment-db:
+    image: postgres:latest
+    volumes:
+      - appointment-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: appointmentdb
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: test2024!
+    restart: always
+
+  auth-db:
+    image: postgres:latest
+    volumes:
+      - auth-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: test2024!
+    restart: always
+
+  # profileportal-api:
+  #   build: ./path/to/your/profileportal-api
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DATABASE_URL: postgres://appointment_user:appointment_password@appointment-db/appointmentdb
+  #     AUTH_DATABASE_URL: postgres://auth_user:auth_password@auth-db/authdb
+  #   depends_on:
+  #     - appointment-db
+  #     - auth-db
+  #   restart: always
+
+  # rbac-api:
+  #   build: ./path/to/your/rbac-api
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     DATABASE_URL: postgres://auth_user:auth_password@auth-db/authdb
+  #   depends_on:
+  #     - auth-db
+  #   restart: always
+
+volumes:
+  appointment-data:
+  auth-data:

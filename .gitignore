@@ -1,0 +1,5 @@
+.DS_Store
+./auth/node_modules
+./profileportal/node_modules
+./auth/package-lock.json
+./profileportal/package-lock.json
