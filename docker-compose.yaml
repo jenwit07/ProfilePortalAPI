@@ -3,8 +3,11 @@ version: '3.8'
 services:
   appointment-db:
     image: postgres:latest
+    ports:
+      - "5433:5432"
     volumes:
       - appointment-data:/var/lib/postgresql/data
+      - ./ddl/appointment.sql:/docker-entrypoint-initdb.d/appointment.sql
     environment:
       POSTGRES_DB: appointmentdb
       POSTGRES_USER: dbadmin
@@ -13,8 +16,11 @@ services:
 
   auth-db:
     image: postgres:latest
+    ports:
+      - "5434:5432"
     volumes:
       - auth-data:/var/lib/postgresql/data
+      - ./ddl/auth.sql:/docker-entrypoint-initdb.d/auth.sql
     environment:
       POSTGRES_DB: authdb
       POSTGRES_USER: dbadmin
@@ -26,8 +32,8 @@ services:
   #   ports:
   #     - "3000:3000"
   #   environment:
-  #     DATABASE_URL: postgres://appointment_user:appointment_password@appointment-db/appointmentdb
-  #     AUTH_DATABASE_URL: postgres://auth_user:auth_password@auth-db/authdb
+  #     APPOINTMENT_DATABASE_URL: postgres://dbadmin:test2024!@appointment-db:5432/appointmentdb
+  #     AUTH_DATABASE_URL: postgres://dbadmin:test2024!@auth-db:5432/authdb
   #   depends_on:
   #     - appointment-db
   #     - auth-db
@@ -38,7 +44,7 @@ services:
   #   ports:
   #     - "3001:3001"
   #   environment:
-  #     DATABASE_URL: postgres://auth_user:auth_password@auth-db/authdb
+  #     AUTH_DATABASE_URL: postgres://dbadmin:test2024!@auth-db:5432/authdb
   #   depends_on:
   #     - auth-db
   #   restart: always

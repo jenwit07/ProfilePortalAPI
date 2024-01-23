@@ -1,315 +1,265 @@
----
-swagger: "2.0"
+swagger: '2.0'
 info:
-  description: "API for managing recruitment appointments."
-  version: "1.0.0"
-  title: "Recruitment Appointment API"
-basePath: "/api"
+  version: '1.0.0'
+  title: 'Profile Portal API'
+  description: 'API for managing recruitment appointments.'
+basePath: '/api'
 schemes:
-- "http"
+  - 'http'
+
+securityDefinitions:
+  BearerAuth:
+    type: 'apiKey'
+    name: 'Authorization'
+    in: 'header'
+
+tags:
+  - name: 'Appointments'
+  - name: 'Comments'
+  - name: 'Update History'
+
 paths:
   /v1/appointments:
     get:
-      tags:
-      - "Appointments"
-      summary: "Get List of Appointments"
-      description: "Retrieve a list of all appointments."
-      operationId: "v1AppointmentsGET"
-      parameters: []
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get List of Appointments'
       responses:
-        "200":
-          description: "A list of appointments"
+        200:
+          description: 'A list of appointments'
           schema:
-            type: "array"
+            type: 'array'
             items:
-              $ref: "#/definitions/Appointment"
-      x-swagger-router-controller: "Appointments"
-  /v1/appointments/{appointmentId}:
-    get:
-      tags:
-      - "Appointments"
-      summary: "Get Appointment Details"
-      description: "Retrieve details for a specific appointment by ID."
-      operationId: "v1AppointmentsAppointmentIdGET"
+              $ref: '#/definitions/Appointment'
+    post:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Create a New Appointment'
       parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
-      responses:
-        "200":
-          description: "Appointment data"
+        - in: 'body'
+          name: 'appointment'
+          required: true
           schema:
-            $ref: "#/definitions/AppointmentDetails"
-      x-swagger-router-controller: "Appointments"
-    put:
-      tags:
-      - "Appointments"
-      summary: "Edit Appointment"
-      description: "Update details for a specific appointment by ID."
-      operationId: "v1AppointmentsAppointmentIdPUT"
-      parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "appointment"
-        description: "Appointment object that needs to be updated"
-        required: true
-        schema:
-          $ref: "#/definitions/Appointment"
+            $ref: '#/definitions/Appointment'
       responses:
-        "200":
-          description: "Appointment updated successfully"
-        "400":
-          description: "Invalid input"
-      x-swagger-router-controller: "Appointments"
+        201:
+          description: 'Appointment created'
+        400:
+          description: 'Invalid input'
+  /v1/appointments/{appointmentId}:
+    put:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Update an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'appointment'
+          required: true
+          schema:
+            $ref: '#/definitions/Appointment'
+      responses:
+        200:
+          description: 'Appointment updated'
+        400:
+          description: 'Invalid input'
+        404:
+          description: 'Appointment not found'
+    delete:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Delete an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+      responses:
+        200:
+          description: 'Appointment deleted'
+        404:
+          description: 'Appointment not found'
   /v1/appointments/{appointmentId}/comments:
     get:
-      tags:
-      - "Comments"
-      summary: "Get Appointment Comments"
-      description: "Retrieve comments for a specific appointment."
-      operationId: "v1AppointmentsAppointmentIdCommentsGET"
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get All Comments for an Appointment'
       parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
       responses:
-        "200":
-          description: "An array of comments for the appointment"
+        200:
+          description: 'An array of comments for the appointment'
           schema:
-            type: "array"
+            type: 'array'
             items:
-              $ref: "#/definitions/Comment"
-      x-swagger-router-controller: "Comments"
-  /appointments/{appointmentId}/comments/{commentId}:
+              $ref: '#/definitions/Comment'
+    post:
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Add a New Comment to an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'comment'
+          required: true
+          schema:
+            $ref: '#/definitions/Comment'
+      responses:
+        201:
+          description: 'Comment added'
+        400:
+          description: 'Invalid input'
+  /v1/appointments/{appointmentId}/comments/{commentId}:
     put:
-      tags:
-      - "Comments"
-      summary: "Update an Existing Comment"
-      description: "Update an existing comment by its ID on a specific appointment."
-      operationId: "appointmentsAppointmentIdCommentsCommentIdPUT"
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Update a Comment on an Appointment'
       parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
-      - name: "commentId"
-        in: "path"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "comment"
-        description: "Comment object that needs to be updated"
-        required: true
-        schema:
-          $ref: "#/definitions/Comment"
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+        - in: 'path'
+          name: 'commentId'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'comment'
+          required: true
+          schema:
+            $ref: '#/definitions/Comment'
       responses:
-        "200":
-          description: "Comment updated"
-        "400":
-          description: "Invalid input"
-        "404":
-          description: "Comment or appointment not found"
-      x-swagger-router-controller: "Comments"
+        200:
+          description: 'Comment updated'
+        400:
+          description: 'Invalid input'
+        404:
+          description: 'Comment or appointment not found'
     delete:
-      tags:
-      - "Comments"
-      summary: "Delete an Existing Comment"
-      description: "Delete an existing comment by its ID from a specific appointment."
-      operationId: "appointmentsAppointmentIdCommentsCommentIdDELETE"
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Delete a Comment from an Appointment'
       parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
-      - name: "commentId"
-        in: "path"
-        required: true
-        type: "string"
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+        - in: 'path'
+          name: 'commentId'
+          required: true
+          type: 'integer'
       responses:
-        "200":
-          description: "Comment deleted"
-        "404":
-          description: "Comment or appointment not found"
-      x-swagger-router-controller: "Comments"
+        200:
+          description: 'Comment deleted'
+        404:
+          description: 'Comment or appointment not found'
   /v1/appointments/{appointmentId}/history:
     get:
-      tags:
-      - "Appointments"
-      summary: "Get Appointment Update History"
-      description: "Retrieve the update history for a specific appointment."
-      operationId: "v1AppointmentsAppointmentIdHistoryGET"
+      tags: [ 'Update History' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get Update History for an Appointment'
       parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
       responses:
-        "200":
-          description: "An array of update history logs for the appointment"
+        200:
+          description: 'An array of update history logs for the appointment'
           schema:
-            type: "array"
+            type: 'array'
             items:
-              $ref: "#/definitions/ChangeLog"
-      x-swagger-router-controller: "Appointments"
+              $ref: '#/definitions/ChangeLog'
     post:
-      tags:
-      - "Appointments"
-      summary: "Add Update History Entry"
-      description: "Add a new entry to the update history for a specific appointment."
-      operationId: "v1AppointmentsAppointmentIdHistoryPOST"
+      tags: [ 'Update History' ]
+      security:
+        - BearerAuth: []
+      summary: 'Add an Entry to Update History of an Appointment'
       parameters:
-      - name: "appointmentId"
-        in: "path"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "changeLog"
-        description: "Change log entry to add"
-        required: true
-        schema:
-          $ref: "#/definitions/ChangeLog"
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'changeLog'
+          required: true
+          schema:
+            $ref: '#/definitions/ChangeLog'
       responses:
-        "200":
-          description: "Change log entry added successfully"
-        "400":
-          description: "Invalid input"
-      x-swagger-router-controller: "Appointments"
+        201:
+          description: 'Change log entry added'
+        400:
+          description: 'Invalid input'
+
 definitions:
   Appointment:
-    type: "object"
+    type: 'object'
     properties:
       id:
-        type: "string"
+        type: 'integer'
       topic:
-        type: "string"
+        type: 'string'
       description:
-        type: "string"
+        type: 'string'
       status:
-        type: "string"
+        type: 'string'
       created_by:
-        type: "string"
+        type: 'string'
       create_date:
-        type: "string"
+        type: 'string'
       create_time:
-        type: "string"
-    example:
-      create_time: "create_time"
-      topic: "topic"
-      description: "description"
-      id: "id"
-      create_date: "create_date"
-      created_by: "created_by"
-      status: "status"
-  AppointmentDetails:
-    type: "object"
-    properties:
-      appointment:
-        $ref: "#/definitions/Appointment"
-      comments:
-        type: "array"
-        items:
-          $ref: "#/definitions/Comment"
-      update_history:
-        type: "array"
-        items:
-          $ref: "#/definitions/ChangeLog"
-    example:
-      comments:
-      - create_by: "create_by"
-        comment_name: "comment_name"
-        comment_details: "comment_details"
-        id: "id"
-        create_date: "create_date"
-        update_by: "update_by"
-        update_date: "update_date"
-      - create_by: "create_by"
-        comment_name: "comment_name"
-        comment_details: "comment_details"
-        id: "id"
-        create_date: "create_date"
-        update_by: "update_by"
-        update_date: "update_date"
-      appointment:
-        create_time: "create_time"
-        topic: "topic"
-        description: "description"
-        id: "id"
-        create_date: "create_date"
-        created_by: "created_by"
-        status: "status"
-      update_history:
-      - update_time: "update_time"
-        topic: "topic"
-        description: "description"
-        id: "id"
-        update_date: "update_date"
-        status: "status"
-      - update_time: "update_time"
-        topic: "topic"
-        description: "description"
-        id: "id"
-        update_date: "update_date"
-        status: "status"
+        type: 'string'
   Comment:
-    type: "object"
-    required:
-    - "comment_details"
-    - "comment_name"
-    - "create_by"
-    - "create_date"
+    type: 'object'
     properties:
       id:
-        type: "string"
+        type: 'integer'
+      appointment_id:
+        type: 'integer'
       comment_name:
-        type: "string"
+        type: 'string'
       comment_details:
-        type: "string"
+        type: 'string'
       create_date:
-        type: "string"
+        type: 'string'
       create_by:
-        type: "string"
+        type: 'string'
       update_date:
-        type: "string"
+        type: 'string'
       update_by:
-        type: "string"
-    example:
-      create_by: "create_by"
-      comment_name: "comment_name"
-      comment_details: "comment_details"
-      id: "id"
-      create_date: "create_date"
-      update_by: "update_by"
-      update_date: "update_date"
+        type: 'string'
   ChangeLog:
-    type: "object"
-    required:
-    - "description"
-    - "status"
-    - "topic"
-    - "update_date"
-    - "update_time"
+    type: 'object'
     properties:
       id:
-        type: "string"
+        type: 'integer'
+      appointment_id:
+        type: 'integer'
       topic:
-        type: "string"
+        type: 'string'
       description:
-        type: "string"
+        type: 'string'
       status:
-        type: "string"
+        type: 'string'
       update_date:
-        type: "string"
+        type: 'string'
       update_time:
-        type: "string"
-    example:
-      update_time: "update_time"
-      topic: "topic"
-      description: "description"
-      id: "id"
-      update_date: "update_date"
-      status: "status"
+        type: 'string'
