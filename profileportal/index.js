@@ -21,15 +21,6 @@ var app = express();
 global.appointmentDb = initModels( sequelize, DataTypes );
 global.authDb = authInitModels( authSqualize, DataTypes );
 
-// ( async () => {
-//   try {
-//     console.log(await appointmentDb.appointments.findAll())
-//     console.log('Connection has been established successfully.');
-//   } catch (error) {
-//     console.error('Unable to connect to the database:', error);
-//   }
-// })()
-
 app.use(json({ limit: "50mb", extended: true }));
 app.use(urlencoded({ limit: "50mb", extended: true }));
 app.use((req, res, next) => {

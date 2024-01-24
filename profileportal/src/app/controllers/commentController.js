@@ -12,6 +12,9 @@ export const getComments = async (req, res) => {
 
 export const addComment = async (req, res) => {
     try {
+        req.body.create_by = req.decoded.username;
+        req.body.comment_name = req.decoded.username;
+        req.body.update_by = req.decoded.username;
         const result = await addCommentService(req.params.appointmentId, req.body);
         res.status(201).send(result);
     } catch (err) {
@@ -22,6 +25,8 @@ export const addComment = async (req, res) => {
 
 export const updateComment = async (req, res) => {
     try {
+        req.body.update_by = req.decoded.username;
+        req.body.comment_name = req.decoded.username;
         const response = await updateCommentService(req.params.commentId, req.body);
         if (response == 0) {
             return res.status(404).send({ message: "Comment not found" });

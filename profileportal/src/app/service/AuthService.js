@@ -1,16 +1,17 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function loginService(credentials) {
   try {
     const user = await authDb.users.findOne( { where: { username: credentials.username } } );
-    const roles = await authDb.user_roles.findOne( { where: { user_id: user.id } } );
-    const role = await authDb.roles.findOne( { where: { id: roles.role_id } } );
     
     if (!user || !await bcrypt.compare(credentials.password, user.password)) {
       throw new Error('Invalid username or password');
     }
+
+    const roles = await authDb.user_roles.findOne( { where: { user_id: user.id } } );
+    const role = await authDb.roles.findOne( { where: { id: roles.role_id } } );
 
     const token = jwt.sign({ userId: user.id, username: user.username, role: role.role_name }, JWT_SECRET, { expiresIn: '1h' });
     return { token };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticate } from "../app/middleware/auth";
+import { authenticate, checkUserPermission } from "../app/middleware/auth";
 import { getAppointments, createAppointment, getAppointmentById,updateAppointment, deleteAppointment } from "../app/controllers/appointmentController";
 import { getComments, addComment, updateComment, deleteComment } from "../app/controllers/commentController";
 import { getUpdateHistory, addUpdateHistory } from "../app/controllers/updateHistoryController";

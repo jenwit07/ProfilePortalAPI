@@ -12,8 +12,14 @@ export async function getCommentsService(appointmentId) {
 
 export async function addCommentService(appointmentId, commentData) {
   try {
+    const appointment = await appointmentDb.appointments.findOne({
+      where: { id: appointmentId },
+    } );
+    if ( !appointment ) {
+      throw new Error('Appointment not found');
+    }
+
     commentData.appointment_id = appointmentId;
-    commentData.update_by = commentData.create_by;
     const newComment = await appointmentDb.comments.create(commentData);
     return newComment;
   } catch (e) {
