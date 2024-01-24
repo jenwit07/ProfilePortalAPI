@@ -3,12 +3,13 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const authenticate = ( req, res, next ) => {
-    var token = req.headers.authorization
+    var token = req.headers.authorization.replace( 'Bearer ', '')
     console.log( token )
     console.log( JWT_SECRET )
     if (token) {
         jwt.verify(token, JWT_SECRET, function (err, decoded) {
-            if (err) {
+            if ( err ) {
+                console.log( err )
                 return res.json({ success: false, message: 'Failed to authenticate token.' })
             } else {
                 req.decoded = decoded

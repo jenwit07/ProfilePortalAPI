@@ -22,8 +22,8 @@ export const verifyToken = async (req, res) => {
 
 export const registerUser = async ( req, res ) => {
     try {
-        const result = await registerUserService(req.body);
-        res.status(200).send(result);
+        await registerUserService(req.body);
+        res.status(201).send();
     } catch (err) {
         console.error(err);
         res.status(401).send({ name: err.name, message: err.message });

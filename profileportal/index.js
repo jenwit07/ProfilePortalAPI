@@ -11,7 +11,8 @@ import { sequelize, authSqualize } from "./src/config/db.config";
 import { initModels } from "./src/app/models/init-models";
 import { initModels as authInitModels } from "./src/app/auth/init-models";
 import { DataTypes } from "sequelize";
-import { OpenApiValidator } from "express-openapi-validator";
+import * as OpenApiValidator from 'express-openapi-validator';
+import path from "path";
 
 /* CONFIG */
 const bodyParser = require("body-parser");
@@ -52,15 +53,23 @@ app.get("/", (req, res) => {
 } );
 
 / * OpenAPI Specification * /
-// const apiSpec = path.join( __dirname, 'api.yaml' );
-// app.use(
-//   OpenApiValidator.middleware({
-//     apiSpec,
-//     validateResponses: true, // default false
-//   }),
-// );
+const apiSpec = path.join( __dirname, 'api.yaml' );
+app.use(
+  OpenApiValidator.middleware({
+    apiSpec,
+    validateResponses: false,
+  }),
+);
 
-routes(app);
+routes( app );
+
+app.use((err, req, res, next) => {
+  // format error
+  res.status(err.status || 500).json({
+    message: err.message,
+    errors: err.errors,
+  });
+});
 
 app.listen(port, () => {
   console.log(
