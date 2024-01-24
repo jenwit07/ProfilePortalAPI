@@ -39,16 +39,6 @@ services:
   #     - auth-db
   #   restart: always
 
-  # rbac-api:
-  #   build: ./path/to/your/rbac-api
-  #   ports:
-  #     - "3001:3001"
-  #   environment:
-  #     AUTH_DATABASE_URL: postgres://dbadmin:test2024!@auth-db:5432/authdb
-  #   depends_on:
-  #     - auth-db
-  #   restart: always
-
 volumes:
   appointment-data:
   auth-data:
