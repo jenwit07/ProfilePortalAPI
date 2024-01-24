@@ -71,12 +71,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(
-    `#### Stat Time ${dayjs().format(
-      "DD/MM/YYYY HH:mm:ss"
-    )} --- Profile Portal Service is running on port ${port} and ${
-      process.env.APP_ENV
-    } env`
-  );
-});
+if ( process.env.NODE_ENV !== 'test' ) {
+  app.listen(port, () => {
+    console.log(
+      `#### Stat Time ${dayjs().format(
+        "DD/MM/YYYY HH:mm:ss"
+      )} --- Profile Portal Service is running on port ${port} and ${
+        process.env.APP_ENV
+      } env`
+    );
+  });
+}
+
+module.exports = app;
