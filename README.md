@@ -2,8 +2,8 @@
 ProfilePortal is a comprehensive recruitment management system.
 
 ## Features
- - **Appointment management**
- - **Commenting system**
+ - **Appointment management**: every user can edit the card
+ - **Commenting system**: only a logged-in user can edit their own comment
  - **Role-based access control**: In API common check by user login
  - **Rate Limit**: :desinged on 1000 request per 1 hour
 
