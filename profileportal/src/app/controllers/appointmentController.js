@@ -3,7 +3,6 @@ import { getAppointmentService, createAppointmentService, updateAppointmentServi
 export const getAppointments = async (req, res) => {
     try {
         const result = await getAppointmentService( req.query );
-        console.log( result );
         res.status(200).send(result);
     } catch (err) {
         console.error(err);

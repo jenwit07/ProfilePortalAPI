@@ -5,14 +5,16 @@ import cors from "cors";
 import fs from "fs";
 import YAML from "yaml";
 import swaggerUi from "swagger-ui-express";
-import routes from "./src/config/routes";
+import routes from "./config/routes";
 import dayjs from "dayjs";
-import { sequelize, authSqualize } from "./src/config/db.config";
-import { initModels } from "./src/app/models/init-models";
-import { initModels as authInitModels } from "./src/app/auth/init-models";
+import { sequelize, authSqualize } from "./config/db.config";
+import { initModels } from "./app/models/init-models";
+import { initModels as authInitModels } from "./app/auth/init-models";
 import { DataTypes } from "sequelize";
 import * as OpenApiValidator from 'express-openapi-validator';
 import path from "path";
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 /* CONFIG */
 const bodyParser = require("body-parser");
@@ -41,25 +43,34 @@ app.use(
   })
 );
 
-/ * Swagger Documentation * /
-const file  = fs.readFileSync('./api.yaml', 'utf8')
+
+app.use( helmet() );
+
+/* Limit requests from same API */
+const limiter = rateLimit({
+  windowMs: process.env.LIMITER_WINDOWMS, // 1 hour
+  max: process.env.LIMITER_MAX,
+  message: process.env.LIMITER_MESSAGE
+});
+app.use(limiter);
+
+/ * Swagger Documentation and OpenAPI Specification * /
+const apiSpec = path.join( __dirname ,'api.yaml' );
+const file  = fs.readFileSync(apiSpec, 'utf8')
 const swaggerDocument = YAML.parse(file)
 app.use('/profileportal/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-app.get("/", (req, res) => {
-  res.send(
-    `Profile Portal Service is running`
-  );
-} );
-
-/ * OpenAPI Specification * /
-const apiSpec = path.join( __dirname, 'api.yaml' );
 app.use(
   OpenApiValidator.middleware({
     apiSpec,
     validateResponses: false,
   }),
 );
+
+app.get("/", (req, res) => {
+  res.send(
+    `Profile Portal Service is running`
+  );
+});
 
 routes( app );
 
@@ -71,7 +82,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-if ( process.env.NODE_ENV !== 'test' ) {
+if (process.env.NODE_ENV !== 'test') {
   app.listen(port, () => {
     console.log(
       `#### Stat Time ${dayjs().format(

@@ -10,10 +10,7 @@ const stausMap = {
 
 export async function getAppointmentService ( query ) {
   try {
-    console.log( query )
     const { cur_page, per_page, offset, limit, ...rest } = query;
-    console.log( 'offset', offset, 'limit', limit )
-    console.log( 'rest', rest )
     const result = await appointmentDb.appointments.findAndCountAll({
       offset: offset,
       limit: limit,
@@ -83,16 +80,10 @@ export async function updateAppointmentService(id, data) {
       throw new Error('Appointment not found or no changes made');
     } 
     delete exist.dataValues.id;
-    // update to history
-    console.log({
-      appointment_id: id,
-      ...exist.dataValues
-    })
     const history = await appointmentDb.update_history.create( {
       appointment_id: id,
       ...exist.dataValues
     } );
-    console.log( history)
     return { message: 'Appointment updated successfully' };
   
   } catch (e) {

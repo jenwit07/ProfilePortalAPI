@@ -1,6 +1,5 @@
-// appointments.test.js
 import supertest from 'supertest';
-import app from '../index';
+import app from '../src/index';
 
 const request = supertest(app);
 let token;

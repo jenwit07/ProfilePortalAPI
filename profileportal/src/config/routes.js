@@ -11,20 +11,20 @@ module.exports = function (app) {
   const router = Router();
   app.use("/profileportal/v1", router);
 
-  router.use((req, res, next) => {
-    console.log("**Start Log Request")
-    console.log("profileportal backend is getting request with path : /v1" + req.path);
-    if (!!!req.query) {
-      console.log(" --> req.query is : ");
-      console.log(JSON.stringify(req.query, null, 2));
-    }
-    if (!!!req.body) {
-      console.log(" --> req.body is : ");
-      console.log(JSON.stringify(req.body, null, 2));
-    }
-    console.log("**End Log Request")
-    next();
-  } );
+  // router.use((req, res, next) => {
+  //   console.log("**Start Log Request")
+  //   console.log("profileportal backend is getting request with path : /v1" + req.path);
+  //   if (!!!req.query) {
+  //     console.log(" --> req.query is : ");
+  //     console.log(JSON.stringify(req.query, null, 2));
+  //   }
+  //   if (!!!req.body) {
+  //     console.log(" --> req.body is : ");
+  //     console.log(JSON.stringify(req.body, null, 2));
+  //   }
+  //   console.log("**End Log Request")
+  //   next();
+  // });
   
 
   // Appointments Routes

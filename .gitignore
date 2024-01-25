@@ -4,3 +4,4 @@ profileportal/node_modules
 auth/package-lock.json
 profileportal/package-lock.json
 profileportal/coverage
+profileportal/build
