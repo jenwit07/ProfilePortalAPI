@@ -1,0 +1,403 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Profile Portal API'
+  description: 'API for managing recruitment appointments, comments'
+servers:
+  - url: '/profileportal'
+tags:
+  - name: 'Authentication'
+  - name: 'Appointments'
+  - name: 'Comments'
+paths:
+  /v1/auth/login:
+    post:
+      tags: [ 'Authentication' ]
+      summary: 'User Login'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+      responses:
+        '200':
+          description: 'Login successful, token returned.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: 'Unauthorized, invalid credentials.'
+  /v1/auth/verify:
+    get:
+      tags: [ 'Authentication' ]
+      security:
+        - BearerAuth: []
+      summary: 'Verify Token and Get Roles'
+      responses:
+        '200':
+          description: 'Token is valid, user roles returned.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoles'
+        '401':
+          description: 'Unauthorized, token invalid or missing.'
+  /v1/auth/register:
+    post:
+      tags: [ 'Authentication' ]
+      summary: 'User Registration with Role Assignment'
+      description: 'Register a new user with a specified role.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationData'
+      responses:
+        '201':
+          description: 'User registered successfully.'
+        '400':
+          description: 'Invalid input or role not allowed.'
+  /v1/appointments:
+    get:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get List of Appointments'
+      parameters:
+        - in: 'query'
+          name: 'status'
+          schema:
+            type: 'string'
+            enum: [ 'TO_DO', 'IN_PROGRESS', 'DONE' ]
+        - in: 'query'
+          name: 'cur_page'
+          schema:
+            type: 'integer'
+        - in: 'query'
+          name: 'per_page'
+          schema:
+            type: 'integer'
+      responses:
+        '200':
+          description: 'A list of appointments'
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  appointments:
+                    type: 'array'
+                    items:
+                      $ref: '#/components/schemas/Appointment'
+                  total_records:
+                    type: 'integer'
+                  total_pages:
+                    type: 'integer'
+                  cur_page:
+                    type: 'integer'
+                  per_page:
+                    type: 'integer'
+    post:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Create a New Appointment'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointment'
+      responses:
+        '201':
+          description: 'Appointment created'
+        '400':
+          description: 'Invalid input'
+  /v1/appointments/{appointmentId}:
+    get:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          schema:
+            type: 'integer'
+      responses:
+        '200':
+          description: 'An appointment'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '404':
+          description: 'Appointment not found'
+    put:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Update an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          schema:
+            type: 'integer'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointment'
+      responses:
+        '204':
+          description: 'Appointment updated'
+        '400':
+          description: 'Invalid input'
+        '404':
+          description: 'Appointment not found'
+    delete:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Delete an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          schema:
+            type: 'integer'
+      responses:
+        '204':
+          description: 'Appointment deleted'
+        '404':
+          description: 'Appointment not found'
+  /v1/appointments/{appointmentId}/history:
+    get:
+      tags: [ 'Appointments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get Update History for an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          schema:
+            type: 'integer'
+      responses:
+        '200':
+          description: 'An array of update history logs for the appointment'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/ChangeLog'
+  /v1/appointments/{appointmentId}/comments:
+    get:
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Get All Comments for an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          schema:
+            type: 'integer'
+      responses:
+        '200':
+          description: 'An array of comments for the appointment'
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Add a New Comment to an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'appointmentId'
+          required: true
+          schema:
+            type: 'integer'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComment'
+      responses:
+        '201':
+          description: 'Comment added'
+        '400':
+          description: 'Invalid input'
+  /v1/appointments/comments/{commentId}:
+    put:
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Update a Comment on an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'commentId'
+          required: true
+          schema:
+            type: 'integer'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateComment'
+      responses:
+        '204':
+          description: 'Comment updated'
+        '400':
+          description: 'Invalid input'
+        '404':
+          description: 'Comment or appointment not found'
+    delete:
+      tags: [ 'Comments' ]
+      security:
+        - BearerAuth: []
+      summary: 'Delete a Comment from an Appointment'
+      parameters:
+        - in: 'path'
+          name: 'commentId'
+          required: true
+          schema:
+            type: 'integer'
+      responses:
+        '204':
+          description: 'Comment deleted'
+        '404':
+          description: 'Comment or appointment not found'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: 'http'
+      scheme: 'bearer'
+      bearerFormat: 'JWT'
+  schemas:
+    Credentials:
+      type: 'object'
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: 'string'
+        password:
+          type: 'string'
+    TokenResponse:
+      type: 'object'
+      properties:
+        token:
+          type: 'string'
+    UserRoles:
+      type: 'object'
+      properties:
+        roles:
+          type: 'array'
+          items:
+            type: 'string'
+    RegistrationData:
+      type: 'object'
+      required:
+        - username
+        - password
+        - role
+      properties:
+        username:
+          type: 'string'
+        password:
+          type: 'string'
+        role:
+          type: 'string'
+    CreateAppointment:
+      additionalProperties: false
+      type: 'object'
+      properties:
+        topic:
+          type: 'string'
+        description:
+          type: 'string'
+        status:
+          type: 'string'
+          enum:
+            - 'TO_DO'
+            - 'IN_PROGRESS'
+            - 'DONE'
+        created_by:
+          type: 'string'
+    Appointment:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        topic:
+          type: 'string'
+        description:
+          type: 'string'
+        status:
+          type: 'string'
+        created_by:
+          type: 'string'
+        create_datetime:
+          type: 'string'
+    CreateComment:
+      additionalProperties: false
+      type: 'object'
+      properties:
+        comment_details:
+          type: 'string'
+    UpdateComment:
+      additionalProperties: false
+      type: 'object'
+      properties:
+        comment_details:
+          type: 'string'
+    Comment:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        appointment_id:
+          type: 'integer'
+        comment_name:
+          type: 'string'
+        comment_details:
+          type: 'string'
+        create_datetime:
+          type: 'string'
+        create_by:
+          type: 'string'
+        update_datetime:
+          type: 'string'
+        update_by:
+          type: 'string'
+    ChangeLog:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        appointment_id:
+          type: 'integer'
+        topic:
+          type: 'string'
+        description:
+          type: 'string'
+        status:
+          type: 'string'
+        create_datetime:
+          type: 'string'
