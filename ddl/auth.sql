@@ -18,3 +18,6 @@ CREATE TABLE user_roles (
 );
 
 INSERT INTO roles (role_name) VALUES ('admin'), ('recruiter');
+INSERT INTO users (id, username, password) VALUES (1, 'admin', '$2a$10$PEoREhKL3dRaS9ctMXjrXeOl0gBMTXg/XwpFQoyXcjRn/9IHw2v3q');
+INSERT INTO user_roles (user_id, role_id) VALUES (1, 1);
+```

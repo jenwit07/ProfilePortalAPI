@@ -312,6 +312,7 @@ components:
           items:
             type: 'string'
     RegistrationData:
+      additionalProperties: false
       type: 'object'
       required:
         - username
@@ -324,6 +325,9 @@ components:
           type: 'string'
         role:
           type: 'string'
+          enum:
+            - 'admin'
+            - 'recruiter'
     CreateAppointment:
       additionalProperties: false
       type: 'object'
