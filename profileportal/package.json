@@ -2,7 +2,7 @@
   "name": "profile-portal-api",
   "version": "1.0.0",
   "description": "API for managing recruitment appointments.",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "clean": "rm -rf build && mkdir build",
     "build-server": "babel -d ./build ./src -s && cp -r ./src/api.yaml ./build/api.yaml",
@@ -10,7 +10,7 @@
     "prestart": "npm install",
     "start": "node index.js",
     "babel-node": "babel-node",
-    "start:dev": "cross-env NODE_ENV=development nodemon --exec npm run babel-node -- ./build/index.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon --exec npm run babel-node -- ./src/index.js",
     "test": "cross-env NODE_ENV=test jest",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage",
     "appointment:models": "sequelize-auto -o \"./src/app/models\" -d appointmentdb -h localhost -u dbadmin -p 5433 -x test2024! -e postgres",

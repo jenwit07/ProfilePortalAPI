@@ -1,4 +1,4 @@
-import { getUpdateHistoryService } from "../service/updateHistoryService";
+import { getUpdateHistoryService } from "../service/UpdateHistoryService";
 
 export const getUpdateHistory = async (req, res) => {
     try {

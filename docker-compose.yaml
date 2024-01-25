@@ -27,17 +27,16 @@ services:
       POSTGRES_PASSWORD: test2024!
     restart: always
 
-  # profileportal-api:
-  #   build: ./path/to/your/profileportal-api
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     APPOINTMENT_DATABASE_URL: postgres://dbadmin:test2024!@appointment-db:5432/appointmentdb
-  #     AUTH_DATABASE_URL: postgres://dbadmin:test2024!@auth-db:5432/authdb
-  #   depends_on:
-  #     - appointment-db
-  #     - auth-db
-  #   restart: always
+  profileportal-api:
+    build: ./profileportal
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: server
+    depends_on:
+      - appointment-db
+      - auth-db
+    restart: always
 
 volumes:
   appointment-data:
