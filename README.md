@@ -12,6 +12,7 @@ ProfilePortal is a comprehensive recruitment management system.
  - git clone https://github.com/jenwit07/ProfilePortalAPI
  - cd ProfilePortalAPI
  - docker-compose up -d
+ ```
 
  The server should now be running on http://localhost:3000
   - Access Swagger Documentation at http://localhost:3000/profileportal/api-docs/
