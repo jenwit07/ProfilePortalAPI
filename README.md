@@ -9,9 +9,9 @@ ProfilePortal is a comprehensive recruitment management system.
 
 ### Installing
 ```sh
- - git clone https://github.com/jenwit07/ProfilePortalAPI
- - cd ProfilePortalAPI
- - docker-compose up -d
+ git clone https://github.com/jenwit07/ProfilePortalAPI
+ cd ProfilePortalAPI
+ docker-compose up -d
  ```
 
  The server should now be running on http://localhost:3000
@@ -20,6 +20,17 @@ ProfilePortal is a comprehensive recruitment management system.
   - Base credentials for generating a token are:
     - Username: `admin`
     - Password: `admin`
+
+I also use Jest to Test profileportal-api,
+```sh
+ cd ProfilePortalAPI
+ npm run test
+ ```
+ and, you can generate code coverage by command
+ ```sh
+ npm run test:coverage
+ ```
+
 
 ### ProfilePortalAPI build with
  - Express.js
